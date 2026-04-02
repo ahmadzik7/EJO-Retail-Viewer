@@ -2,714 +2,824 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>CI Form — Laporan & Request Project</title>
-<meta name="theme-color" content="#0F172A">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EJO Status Viewer — CI Project</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --bg:#0F172A;--surface:#1E293B;--surface2:#263244;--border:#334155;
-    --text:#E2E8F0;--text-muted:#64748B;--text-dim:#94A3B8;
-    --accent:#F59E0B;--teal:#14B8A6;--success:#22C55E;--danger:#EF4444;
-    --radius:8px;--mono:'Courier New',monospace;
-  }
-  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;padding:0 0 80px;}
+:root {
+  --bg:        #0a0c0f;
+  --surface:   #111318;
+  --surface2:  #181b22;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --text:      #e8eaf0;
+  --text-dim:  #9da3b4;
+  --text-muted:#5a6070;
+  --accent:    #f59e0b;
+  --accent2:   #3b82f6;
+  --accent3:   #10b981;
+  --danger:    #ef4444;
+  --warn:      #f97316;
+  --purple:    #a855f7;
+  --teal:      #14b8a6;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'IBM Plex Sans', sans-serif;
+}
 
-  .top-bar{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 16px;
-    display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
-  .logo{width:36px;height:36px;background:var(--accent);border-radius:6px;display:flex;align-items:center;
-    justify-content:center;font-weight:900;font-size:14px;color:#0F172A;flex-shrink:0;}
-  .top-bar h1{font-size:14px;font-weight:700;letter-spacing:0.5px;}
-  .top-bar p{font-size:10px;color:var(--text-muted);margin-top:1px;}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  .tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:64px;z-index:99;}
-  .tab-btn{flex:1;padding:12px 8px;text-align:center;font-size:11px;font-weight:600;color:var(--text-muted);
-    border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:0.5px;transition:all .2s;}
-  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+/* ── TOP BAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,15,0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; gap: 16px;
+  padding: 0 24px; height: 54px;
+}
+.topbar-logo {
+  width: 32px; height: 32px; background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 700; font-size: 13px;
+  color: #000; flex-shrink: 0;
+}
+.topbar-title { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+.topbar-sub   { font-size: 10px; color: var(--text-muted); font-family: var(--mono); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
+.sync-dot.ok     { background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+.sync-dot.error  { background: var(--danger); }
+.sync-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+.sync-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
+.badge-ro { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  padding: 3px 8px; background: rgba(168,85,247,0.15); color: var(--purple);
+  border: 1px solid rgba(168,85,247,0.3); }
+.btn-refresh {
+  padding: 5px 12px; font-family: var(--mono); font-size: 10px; font-weight: 600;
+  background: transparent; border: 1px solid var(--border2); color: var(--text-dim);
+  cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px;
+}
+.btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
 
-  .submitter-banner{background:rgba(245,158,11,0.07);border:1.5px solid rgba(245,158,11,0.4);
-    border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;}
-  .submitter-banner .banner-label{color:var(--accent);font-size:10px;font-weight:700;
-    letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:6px;}
-  .submitter-banner input{width:100%;background:var(--surface);border:1px solid var(--border);
-    color:var(--text);padding:10px 12px;border-radius:var(--radius);font-size:14px;font-weight:600;
-    outline:none;transition:border-color .2s;}
-  .submitter-banner input:focus{border-color:var(--accent);}
-  .submitter-banner small{display:block;margin-top:5px;font-size:10px;color:var(--text-muted);}
+/* ── LAYOUT ── */
+.wrap { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
 
-  .form-wrap{max-width:540px;margin:0 auto;padding:16px;}
-  .section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--accent);
-    text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-  .section-label:first-child{margin-top:0;}
+/* ── HERO ── */
+.hero {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.hero-left h1 { font-family: var(--mono); font-size: 20px; font-weight: 700; letter-spacing: 1px; }
+.hero-left p  { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+.hero-meta { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-align: right; }
 
-  .field{margin-bottom:13px;}
-  label{display:block;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:5px;letter-spacing:0.3px;}
-  label .req{color:var(--accent);}
-  input[type=text],input[type=date],input[type=number],textarea,select{
-    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
-    padding:10px 12px;border-radius:var(--radius);font-size:13px;outline:none;
-    transition:border-color .2s;-webkit-appearance:none;appearance:none;}
-  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
-  textarea{resize:vertical;min-height:80px;line-height:1.5;}
-  select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* ── STAT CARDS ── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 14px 16px; position: relative; overflow: hidden;
+}
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat-card.amber::before { background: var(--accent); }
+.stat-card.blue::before  { background: var(--accent2); }
+.stat-card.green::before { background: var(--accent3); }
+.stat-card.red::before   { background: var(--danger); }
+.stat-card.purple::before{ background: var(--purple); }
+.stat-card.teal::before  { background: var(--teal); }
+.stat-val { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.stat-lbl { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
 
-  .info-note{background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.25);
-    border-radius:6px;padding:8px 12px;font-size:10px;color:var(--teal);
-    margin-top:-4px;margin-bottom:10px;line-height:1.5;}
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 20px; padding: 12px 14px;
+  background: var(--surface); border: 1px solid var(--border);
+}
+.filter-bar input, .filter-bar select {
+  background: var(--bg); border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--mono); font-size: 11px;
+  padding: 7px 11px; outline: none; transition: border-color 0.15s;
+}
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+.filter-bar input { flex: 1; min-width: 200px; }
+.filter-label { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
 
-  .photo-section-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--teal);
-    text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid rgba(20,184,166,0.25);}
-  .photo-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;
-    cursor:pointer;transition:border-color .2s,background .2s;background:var(--surface);}
-  .photo-zone:hover,.photo-zone.dragover{border-color:var(--teal);background:rgba(20,184,166,0.04);}
-  .zone-icon{font-size:26px;margin-bottom:6px;}
-  .zone-title{font-size:12px;font-weight:600;color:var(--text-dim);}
-  .zone-sub{font-size:10px;color:var(--text-muted);margin-top:3px;}
-  input[type=file]{display:none;}
+/* ── SECTION HEADER ── */
+.sec-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sec-title { font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+.sec-count { font-family: var(--mono); font-size: 10px; color: var(--text-muted); }
 
-  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
-  .photo-thumb{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--border);background:var(--surface2);}
-  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.75);border:none;color:#fff;
-    font-size:13px;width:22px;height:22px;border-radius:50%;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;line-height:1;}
-  .photo-badge{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.72);
-    padding:3px 5px;font-size:8px;text-align:center;font-family:var(--mono);line-height:1.2;}
-  .badge-compress{color:var(--accent);}
-  .badge-upload{color:#60A5FA;}
-  .badge-done{color:var(--success);}
-  .badge-error{color:var(--danger);}
+/* ── EJO CARDS ── */
+.ejo-grid { display: flex; flex-direction: column; gap: 10px; }
 
-  .upload-progress{margin-top:8px;display:none;}
-  .upload-progress.show{display:block;}
-  .progress-track{background:var(--surface2);border-radius:4px;height:5px;overflow:hidden;}
-  .progress-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .3s;}
-  .progress-text{font-size:10px;color:var(--text-muted);margin-top:4px;text-align:center;font-family:var(--mono);}
+.ejo-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--border2);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.ejo-card:hover { border-left-color: var(--accent); box-shadow: 0 2px 16px rgba(245,158,11,0.08); }
+.ejo-card.st-done       { border-left-color: var(--accent3); }
+.ejo-card.st-inprogress { border-left-color: var(--accent); }
+.ejo-card.st-blocked    { border-left-color: var(--danger); }
+.ejo-card.st-waiting    { border-left-color: var(--text-muted); }
+.ejo-card.st-open       { border-left-color: var(--accent2); }
 
-  .submit-btn{width:100%;background:var(--accent);color:#0F172A;border:none;padding:14px;
-    border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.5px;
-    margin-top:20px;transition:opacity .2s;}
-  .submit-btn:hover{opacity:.9;}
-  .submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ejo-card-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; flex-wrap: wrap;
+}
+.ejo-no {
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--accent); flex-shrink: 0; min-width: 110px;
+}
+.ejo-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; }
+.ejo-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.ejo-progress-wrap { width: 90px; height: 4px; background: var(--border2); border-radius: 2px; flex-shrink: 0; }
+.ejo-progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+.ejo-pct { font-family: var(--mono); font-size: 10px; color: var(--text-muted); min-width: 30px; text-align: right; }
+.expand-btn {
+  font-family: var(--mono); font-size: 10px; padding: 3px 9px;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text-muted); cursor: pointer; transition: all 0.12s; flex-shrink: 0;
+}
+.expand-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .status-box{display:none;background:var(--surface2);border:1px solid var(--border);
-    border-radius:var(--radius);padding:20px;text-align:center;margin-top:16px;}
-  .status-box.show{display:block;}
-  .status-box.success{border-color:var(--success);}
-  .status-box.error{border-color:var(--danger);}
-  .status-icon{font-size:36px;margin-bottom:10px;}
-  .status-title{font-size:16px;font-weight:700;margin-bottom:8px;}
-  .status-msg{font-size:12px;color:var(--text-muted);line-height:1.7;}
-  .drive-links{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);}
-  .drive-links p{font-size:10px;color:var(--text-muted);margin-bottom:6px;}
-  .drive-link{display:inline-block;margin:2px 0;color:var(--teal);font-size:11px;
-    text-decoration:none;border-bottom:1px dashed var(--teal);}
-  .reset-btn{background:none;border:1px solid var(--border);color:var(--text);
-    padding:8px 20px;border-radius:var(--radius);font-size:12px;cursor:pointer;margin-top:14px;}
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  padding: 3px 9px; letter-spacing: 0.5px;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.badge.open       { background: rgba(59,130,246,0.1);  color: var(--accent2); border: 1px solid rgba(59,130,246,0.25); }
+.badge.inprogress { background: rgba(245,158,11,0.1);  color: var(--accent);  border: 1px solid rgba(245,158,11,0.25); }
+.badge.blocked    { background: rgba(239,68,68,0.1);   color: var(--danger);  border: 1px solid rgba(239,68,68,0.25); }
+.badge.waiting    { background: rgba(90,96,112,0.15);  color: var(--text-dim);border: 1px solid var(--border2); }
+.badge.done       { background: rgba(16,185,129,0.1);  color: var(--accent3); border: 1px solid rgba(16,185,129,0.25); }
 
-  .spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(0,0,0,0.3);
-    border-top-color:#0F172A;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
-  @keyframes spin{to{transform:rotate(360deg)}}
+/* ── TYPE BADGE ── */
+.type-badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  padding: 2px 7px; letter-spacing: 0.5px;
+}
 
-  .footer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);
-    padding:8px 16px;font-size:10px;color:var(--text-muted);text-align:center;}
+/* ── EXPAND DETAIL ── */
+.ejo-detail { display: none; border-top: 1px solid var(--border); }
+.ejo-detail.open { display: block; }
+.ejo-detail-inner { padding: 16px; }
+
+.detail-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px; margin-bottom: 16px;
+}
+.detail-item-lbl { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.detail-item-val { font-size: 12px; font-weight: 500; }
+
+.phases-title { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.phase-list { display: flex; flex-direction: column; gap: 6px; }
+.phase-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border);
+}
+.phase-type { font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 2px 6px; }
+.phase-type.project { background: rgba(245,158,11,0.1); color: var(--accent); }
+.phase-type.fase    { background: rgba(59,130,246,0.1);  color: var(--accent2); }
+.phase-name { font-size: 12px; font-weight: 600; flex: 1; min-width: 0; }
+.phase-sub  { font-size: 10px; color: var(--text-muted); }
+.phase-date { font-family: var(--mono); font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+
+/* ── MATERIAL SECTION ── */
+.mat-section { margin-top: 12px; }
+.mat-section-title { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.mat-list { display: flex; flex-direction: column; gap: 4px; }
+.mat-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 7px 12px; background: var(--bg); border: 1px solid var(--border);
+  font-size: 11px;
+}
+.mat-name { flex: 1; font-weight: 500; }
+.mat-partno { font-family: var(--mono); font-size: 9px; color: var(--text-muted); min-width: 80px; }
+.mat-qty { font-family: var(--mono); font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+.mat-status-badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  padding: 2px 7px; flex-shrink: 0;
+}
+.mat-status-badge.pending { background: rgba(90,96,112,0.2); color: var(--text-muted); border: 1px solid var(--border2); }
+.mat-status-badge.order   { background: rgba(59,130,246,0.12); color: var(--accent2); border: 1px solid rgba(59,130,246,0.25); }
+.mat-status-badge.ready   { background: rgba(16,185,129,0.12); color: var(--accent3); border: 1px solid rgba(16,185,129,0.25); }
+.mat-status-badge.used    { background: rgba(90,96,112,0.12); color: var(--text-muted); border: 1px solid var(--border); opacity: 0.7; }
+.mat-eta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); flex-shrink: 0; }
+.mat-empty { font-family: var(--mono); font-size: 10px; color: var(--text-muted); padding: 8px 0; font-style: italic; }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-title { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.empty-sub { font-size: 12px; color: var(--text-muted); }
+
+/* ── URL CONFIG ── */
+.url-config {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); padding: 20px 24px; margin-bottom: 24px;
+}
+.url-config h2 { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; color: var(--accent); }
+.url-config p  { font-size: 12px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.6; }
+.url-input-row { display: flex; gap: 8px; }
+.url-input-row input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border2);
+  color: var(--text); font-family: var(--mono); font-size: 11px; padding: 8px 12px; outline: none;
+}
+.url-input-row input:focus { border-color: var(--accent); }
+.btn-save-url {
+  padding: 8px 16px; font-family: var(--mono); font-size: 11px; font-weight: 700;
+  background: var(--accent); color: #000; border: none; cursor: pointer; transition: opacity 0.15s;
+}
+.btn-save-url:hover { opacity: 0.85; }
+.url-hint { font-family: var(--mono); font-size: 9px; color: var(--text-muted); margin-top: 8px; }
+
+/* ── LOADING ── */
+.loading-overlay {
+  text-align: center; padding: 80px 20px;
+}
+.loading-spinner {
+  width: 36px; height: 36px; border: 3px solid var(--border2);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center; padding: 24px;
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text-muted); letter-spacing: 1px;
+  border-top: 1px solid var(--border); margin-top: 40px;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  .wrap { padding: 16px 12px; }
+  .topbar { padding: 0 14px; }
+  .ejo-card-header { gap: 8px; }
+  .ejo-no { min-width: 90px; font-size: 12px; }
+  .ejo-progress-wrap { width: 60px; }
+  .stats { grid-template-columns: repeat(3,1fr); }
+  .stat-val { font-size: 20px; }
+}
+@media(max-width:480px) {
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .filter-bar { padding: 10px; }
+  .detail-grid { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="logo">CI</div>
-  <div><h1>CI PROJECT FORM</h1><p>Production · Continuous Improvement Dept</p></div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">CI</div>
+  <div>
+    <div class="topbar-title">EJO STATUS VIEWER</div>
+    <div class="topbar-sub">CI Project Command Center · Read Only</div>
+  </div>
+  <div class="topbar-right">
+    <div class="sync-dot" id="sync-dot"></div>
+    <span class="sync-label" id="sync-label">Memuat...</span>
+    <span class="badge-ro">READ ONLY</span>
+    <button class="btn-refresh" onclick="loadData()">↻ Refresh</button>
+  </div>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('project')" id="tab-project">📋 PROJECT/PERBAIKAN </button>
-  <button class="tab-btn" onclick="switchTab('issue')" id="tab-issue">🔴 LAPORKAN MASALAH</button>
-</div>
+<div class="wrap" id="main-wrap">
 
-<!-- ══════════════ FORM PROJECT ══════════════ -->
-<div class="form-wrap" id="form-project">
-
-  <div class="submitter-banner">
-    <span class="banner-label">Nama Pengaju <span style="color:var(--danger)">*</span></span>
-    <input type="text" id="pj-submitter" placeholder="Nama kamu / tim / departemen" autocomplete="name">
-    <small>Isi nama terlebih dahulu sebelum melanjutkan form di bawah.</small>
+  <!-- URL CONFIG (shown when not configured) -->
+  <div class="url-config" id="url-config-box">
+    <h2>⚙ KONFIGURASI URL DATA</h2>
+    <p>Masukkan URL Google Apps Script dari CI Dashboard untuk menampilkan data EJO secara real-time. URL ini bisa didapat dari admin CI Dashboard (klik ⚙️ di pojok kanan atas dashboard).</p>
+    <div class="url-input-row">
+      <input type="text" id="url-input" placeholder="https://script.google.com/macros/s/..." spellcheck="false">
+      <button class="btn-save-url" onclick="saveURL()">SIMPAN & MUAT</button>
+    </div>
+    <div class="url-hint">https://script.google.com/macros/s/AKfycbzOFo5-D8cPiXNEFiK8EvXF3EHo3JKqf6tER4BnzibwctoT28siINH1VXHFDd-erYm2/exec</div>
   </div>
 
-  <div class="section-label">Informasi Project</div>
-
-  <div class="field">
-    <label>Judul / Nama Project <span class="req">*</span></label>
-    <input type="text" id="pj-name" placeholder="Contoh: Perbaikan Pompa CIP Line 2" maxlength="120">
+  <!-- LOADING -->
+  <div class="loading-overlay" id="loading-box" style="display:none;">
+    <div class="loading-spinner"></div>
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);">Mengambil data dari server...</div>
   </div>
 
-  <div class="row2">
-    <div class="field">
-      <label>Kategori <span class="req">*</span></label>
-      <!--
-        FIX [2]: Value disesuaikan dengan kategori yang dikenali dashboard v16.
-        Dashboard mengenali: perbaikan | improve | 5R | SHE
-        (lihat CSS .cat-perbaikan, .cat-improve, .cat-5r, .cat-she di dashboard)
-      -->
-      <select id="pj-cat">
-        <option value="perbaikan">🔧 Perbaikan / Corrective</option>
-        <option value="improve">💡 Improvement / CI</option>
-        <option value="5R">🧹 5R / Housekeeping</option>
-        <option value="SHE">🦺 HSE / Safety</option>
-        <option value="perbaikan">🔩 Preventive Maintenance</option>
-        <option value="improve">📋 SOP / Work Instruction</option>
-        <option value="improve">🏗 Proyek Baru</option>
+  <!-- CONTENT (hidden until loaded) -->
+  <div id="content-box" style="display:none;">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <h1>🏷️ STATUS EJO & MATERIAL</h1>
+        <p>Data diperbarui otomatis dari CI Project Command Center</p>
+      </div>
+      <div class="hero-meta">
+        <div id="last-update-label"></div>
+        <div id="dept-label" style="color:var(--accent);margin-top:2px;"></div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats" id="stats-row"></div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <span class="filter-label">CARI / FILTER</span>
+      <input type="text" id="search-input" placeholder="Cari No. EJO / nama project..." oninput="renderEJO()">
+      <select id="filter-type" onchange="renderEJO()">
+        <option value="">Semua Jenis</option>
+        <option value="civil">Civil</option>
+        <option value="mechanical">Mechanical</option>
+        <option value="electrical">Electrical</option>
+        <option value="program">Program / Automation</option>
+        <option value="it">IT</option>
+        <option value="kalibrasi">Kalibrasi</option>
+      </select>
+      <select id="filter-status" onchange="renderEJO()">
+        <option value="">Semua Status</option>
+        <option value="open">Open</option>
+        <option value="inprogress">On-Going</option>
+        <option value="blocked">Blocked</option>
+        <option value="waiting">Waiting</option>
+        <option value="done">Completed</option>
       </select>
     </div>
-    <div class="field">
-      <label>Prioritas</label>
-      <select id="pj-prio">
-        <option value="H">🔴 High</option>
-        <option value="M" selected>🟡 Medium</option>
-        <option value="L">🟢 Low</option>
-      </select>
+
+    <!-- EJO LIST -->
+    <div class="sec-header">
+      <span class="sec-title">▸ Daftar EJO</span>
+      <span class="sec-count" id="ejo-count-label"></span>
     </div>
-  </div>
-  <div class="info-note">ℹ️ Kategori menentukan tampilan badge di dashboard CI Command Center.</div>
+    <div class="ejo-grid" id="ejo-grid"></div>
 
-  <div class="field">
-    <label>Lokasi / Area <span class="req">*</span></label>
-    <input type="text" id="pj-loc" placeholder="Contoh: Line 2, Ruang Utilitas, Area CIP...">
-  </div>
+  </div><!-- /content-box -->
+</div><!-- /wrap -->
 
-  <div class="field">
-    <label>Nomor EJO (jika sudah ada)</label>
-    <input type="text" id="pj-ejo" placeholder="EJO-XXXXX" style="font-family:var(--mono);">
-  </div>
-
-  <div class="section-label">Deskripsi</div>
-
-  <div class="field">
-    <label>Latar Belakang / Root Cause</label>
-    <textarea id="pj-desc" placeholder="Jelaskan latar belakang, masalah yang terjadi, atau tujuan project ini..."></textarea>
-  </div>
-
-  <div class="field">
-    <label>Catatan Tambahan</label>
-    <textarea id="pj-notes" placeholder="Referensi, permintaan khusus, dsb..." style="min-height:60px;"></textarea>
-  </div>
-
-  <div class="photo-section-label">📷 Foto Kondisi / Lokasi</div>
-
-  <div class="photo-zone" id="pj-photo-zone"
-       onclick="document.getElementById('pj-file').click()"
-       ondrop="handleDrop(event,'pj')"
-       ondragover="event.preventDefault();this.classList.add('dragover')"
-       ondragleave="this.classList.remove('dragover')">
-    <div class="zone-icon">📷</div>
-    <div class="zone-title">Tap untuk ambil / pilih foto</div>
-    <div class="zone-sub">Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive</div>
-    <input type="file" id="pj-file" accept="image/*" multiple capture="environment" onchange="handleSelect(this,'pj')">
-  </div>
-  <div class="photo-grid" id="pj-grid"></div>
-  <div class="upload-progress" id="pj-prog">
-    <div class="progress-track"><div class="progress-fill" id="pj-prog-fill" style="width:0%"></div></div>
-    <div class="progress-text" id="pj-prog-lbl"></div>
-  </div>
-
-  <div id="pj-status" class="status-box"></div>
-  <button class="submit-btn" id="pj-btn" onclick="submitProject()">📤 KIRIM REQUEST PROJECT</button>
-</div>
-
-<!-- ══════════════ FORM ISSUE ══════════════ -->
-<div class="form-wrap" id="form-issue" style="display:none;">
-
-  <div class="submitter-banner">
-    <span class="banner-label">Nama Pelapor <span style="color:var(--danger)">*</span></span>
-    <input type="text" id="is-submitter" placeholder="Nama kamu / departemen" autocomplete="name">
-    <small>Isi nama terlebih dahulu sebelum melanjutkan laporan di bawah.</small>
-  </div>
-
-  <div class="section-label">Detail Masalah</div>
-
-  <div class="field">
-    <label>Judul Masalah <span class="req">*</span></label>
-    <input type="text" id="is-name" placeholder="Contoh: Kebocoran pipa steam boiler, Alarm HMI error..." maxlength="120">
-  </div>
-
-  <div class="row2">
-    <div class="field">
-      <label>Kategori</label>
-      <select id="is-cat">
-        <option value="mesin">Mesin / Equipment</option>
-        <option value="utilitas">Utilitas (Steam/Air/Listrik)</option>
-        <option value="safety">Safety / HSE</option>
-        <option value="proses">Proses Produksi</option>
-        <option value="kualitas">Kualitas</option>
-        <option value="lainnya">Lainnya</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Prioritas</label>
-      <select id="is-prio">
-        <option value="critical">🚨 Critical</option>
-        <option value="H">🔴 High</option>
-        <option value="M" selected>🟡 Medium</option>
-        <option value="L">🟢 Low</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="field">
-    <label>Lokasi / Area <span class="req">*</span></label>
-    <input type="text" id="is-loc" placeholder="Nama mesin, area, line produksi...">
-  </div>
-
-  <div class="field">
-    <label>Deskripsi Masalah <span class="req">*</span></label>
-    <textarea id="is-desc" placeholder="Jelaskan masalah yang terjadi, kapan mulai, gejala yang terlihat..."></textarea>
-  </div>
-
-  <div class="row2">
-    <div class="field">
-      <label>Tanggal Kejadian</label>
-      <input type="date" id="is-date">
-    </div>
-    <div class="field">
-      <label>Downtime (menit)</label>
-      <input type="number" id="is-downtime" placeholder="0" min="0">
-    </div>
-  </div>
-
-  <div class="field">
-    <label>Tindakan Sementara</label>
-    <textarea id="is-action" placeholder="Langkah darurat, bypass, isolasi yang sudah dilakukan..." style="min-height:60px;"></textarea>
-  </div>
-
-  <div class="photo-section-label">📷 Foto Kondisi / Kerusakan</div>
-
-  <div class="photo-zone" id="is-photo-zone"
-       onclick="document.getElementById('is-file').click()"
-       ondrop="handleDrop(event,'is')"
-       ondragover="event.preventDefault();this.classList.add('dragover')"
-       ondragleave="this.classList.remove('dragover')">
-    <div class="zone-icon">📷</div>
-    <div class="zone-title">Tap untuk foto kondisi alat / kerusakan</div>
-    <div class="zone-sub">Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive</div>
-    <input type="file" id="is-file" accept="image/*" multiple capture="environment" onchange="handleSelect(this,'is')">
-  </div>
-  <div class="photo-grid" id="is-grid"></div>
-  <div class="upload-progress" id="is-prog">
-    <div class="progress-track"><div class="progress-fill" id="is-prog-fill" style="width:0%"></div></div>
-    <div class="progress-text" id="is-prog-lbl"></div>
-  </div>
-
-  <div id="is-status" class="status-box"></div>
-  <button class="submit-btn" id="is-btn" onclick="submitIssue()">🚨 LAPORKAN MASALAH</button>
-</div>
-
-<div class="footer">CI Project Command Center · Production / Continuous Improvement Dept · v3</div>
+<div class="footer">CI EJO VIEWER · READ ONLY · DATA DARI CI PROJECT COMMAND CENTER</div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
-// CI FORM v3 — Fixed for integration with CI Dashboard v16
-//
-// CHANGELOG v3:
-//   FIX [1] redirect:'follow' pada SEMUA fetch ke Apps Script
-//           → tanpa ini, browser menolak redirect dari Apps Script
-//   FIX [2] Kategori project disesuaikan dgn value yg dikenal dashboard
-//           → perbaikan | improve | 5R | SHE  (bukan pm/proyek/sop/lainnya)
-//   FIX [3] activityLog di-trim max 50 entri sebelum pushData
-//           → cegah payload meledak melampaui limit 50KB cell Sheets
-//   FIX [4] Timeout 25 detik pada setiap fetch (AbortController)
-//           → form tidak stuck selamanya saat Apps Script lambat/cold start
-//   FIX [5] Error message lebih informatif — tampilkan HTTP status & pesan asli
-// ══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────────────────
+const LS_URL_KEY = 'ejo_viewer_sync_url';
+let SYNC_URL = localStorage.getItem(LS_URL_KEY) || '';
 
-// ── CONFIG ────────────────────────────────────────────────────
-const SYNC_URL         = 'https://script.google.com/macros/s/AKfycby5RKWJP0yhGDUubEjOxP-t6gcXR2MwfbRZvru5zRXolh94wtzt76lAo3DxfV6nhFjn/exec';
-const MAX_PHOTOS       = 3;
-const COMPRESS_MAX_PX  = 1024;
-const COMPRESS_QUALITY = 0.60;
-const MAX_ORIGINAL_MB  = 15;
-const FETCH_TIMEOUT_MS = 25000;  // FIX [4]: timeout 25 detik untuk semua fetch
+// ─────────────────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────────────────
+let projects   = [];
+let materials  = [];
+let ejoList    = [];
+let expandedNo = null;
 
-// ── STATE ─────────────────────────────────────────────────────
-const S = { pj:[], is:[] };
+// ─────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const urlInput = document.getElementById('url-input');
+  if (SYNC_URL) {
+    urlInput.value = SYNC_URL;
+    loadData();
+  } else {
+    document.getElementById('url-config-box').style.display = 'block';
+    setSyncStatus('', '');
+  }
+  // Auto-refresh every 60s
+  setInterval(() => { if (SYNC_URL) loadData(true); }, 60000);
+});
 
-// ── TABS ──────────────────────────────────────────────────────
-function switchTab(t) {
-  ['project','issue'].forEach(id=>{
-    document.getElementById('form-'+id).style.display = id===t?'block':'none';
-    document.getElementById('tab-'+id).classList.toggle('active', id===t);
-  });
+// ─────────────────────────────────────────────────────────
+//  URL SAVE
+// ─────────────────────────────────────────────────────────
+function saveURL() {
+  const val = document.getElementById('url-input').value.trim();
+  if (!val.includes('script.google.com')) {
+    alert('URL tidak valid. Harus berisi "script.google.com"');
+    return;
+  }
+  SYNC_URL = val;
+  localStorage.setItem(LS_URL_KEY, SYNC_URL);
+  loadData();
 }
 
-// ── UTILS ─────────────────────────────────────────────────────
-const genId    = p  => p+'-'+Date.now()+Math.floor(Math.random()*999);
-const todayStr = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
-const fmtBytes = b  => b<1024?b+'B':b<1048576?(b/1024).toFixed(0)+'KB':(b/1048576).toFixed(1)+'MB';
-const safeName = s  => (s||'').replace(/[\\/:*?"<>|]/g,'').trim().slice(0,50)||'Form';
+// ─────────────────────────────────────────────────────────
+//  SYNC STATUS
+// ─────────────────────────────────────────────────────────
+function setSyncStatus(state, msg) {
+  const dot   = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className   = 'sync-dot' + (state ? ' ' + state : '');
+  label.textContent = msg;
+}
 
-// ── FIX [1][4]: Wrapper fetch dengan redirect:follow + timeout ─
-async function fetchGAS(url, options={}) {
-  const controller = new AbortController();
-  const tid = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+// ─────────────────────────────────────────────────────────
+//  LOAD DATA
+// ─────────────────────────────────────────────────────────
+async function loadData(silent = false) {
+  if (!SYNC_URL) return;
+
+  if (!silent) {
+    document.getElementById('url-config-box').style.display = 'none';
+    document.getElementById('loading-box').style.display    = 'block';
+    document.getElementById('content-box').style.display    = 'none';
+  }
+  setSyncStatus('loading', 'Memuat...');
+
   try {
-    const res = await fetch(url, {
-      ...options,
-      redirect: 'follow',           // FIX [1]: Apps Script selalu redirect — wajib follow
-      signal:   controller.signal,
-    });
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), 20000);
+    const res  = await fetch(SYNC_URL + '?t=' + Date.now(), { method:'GET', redirect:'follow', signal: ctrl.signal });
     clearTimeout(tid);
-    return res;
+    const text = await res.text();
+    const data = JSON.parse(text);
+
+    projects  = data.projects  || [];
+    materials = data.materials || [];
+    ejoList   = buildEJOList();
+
+    document.getElementById('loading-box').style.display  = 'none';
+    document.getElementById('content-box').style.display  = 'block';
+    document.getElementById('url-config-box').style.display = 'none';
+
+    const now = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-update-label').textContent = 'Update: ' + now;
+
+    setSyncStatus('ok', 'Data terbaru · ' + now);
+    renderStats();
+    renderEJO();
+
   } catch(e) {
-    clearTimeout(tid);
-    // FIX [4]: Pesan timeout yang jelas
-    if (e.name === 'AbortError') throw new Error('Request timeout (>25 detik). Cek koneksi atau coba lagi.');
-    throw e;
-  }
-}
-
-// ── COMPRESSION ────────────────────────────────────────────────
-function compressImage(file) {
-  return new Promise((res, rej) => {
-    if (file.size > MAX_ORIGINAL_MB * 1048576) { rej(new Error('File terlalu besar (>'+MAX_ORIGINAL_MB+'MB)')); return; }
-    const reader = new FileReader();
-    reader.onerror = rej;
-    reader.onload = ev => {
-      const img = new Image();
-      img.onerror = rej;
-      img.onload = () => {
-        let {width:w, height:h} = img;
-        if (w > COMPRESS_MAX_PX || h > COMPRESS_MAX_PX) {
-          if (w >= h) { h = Math.round(h*COMPRESS_MAX_PX/w); w = COMPRESS_MAX_PX; }
-          else        { w = Math.round(w*COMPRESS_MAX_PX/h); h = COMPRESS_MAX_PX; }
-        }
-        const cv = document.createElement('canvas');
-        cv.width=w; cv.height=h;
-        cv.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl = cv.toDataURL('image/jpeg', COMPRESS_QUALITY);
-        const b64     = dataUrl.split(',')[1];
-        res({ base64:b64, mimeType:'image/jpeg', origSize:file.size,
-              compSize:Math.round(b64.length*0.75), w, h, dataUrl });
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// ── PHOTO HANDLERS ─────────────────────────────────────────────
-function handleSelect(input, p) { processFiles([...input.files], p); input.value=''; }
-function handleDrop(e, p) {
-  e.preventDefault();
-  document.getElementById(p+'-photo-zone').classList.remove('dragover');
-  processFiles([...e.dataTransfer.files].filter(f=>f.type.startsWith('image/')), p);
-}
-
-async function processFiles(files, p) {
-  const avail = MAX_PHOTOS - S[p].length;
-  if (!avail) { alert('Maksimal '+MAX_PHOTOS+' foto.'); return; }
-  const batch = files.slice(0, avail);
-  setProgress(p, true, 'Mengkompres foto...', 5);
-  for (let i=0; i<batch.length; i++) {
-    const file = batch[i];
-    const idx  = S[p].length;
-    S[p].push({ name:file.name, localUrl:URL.createObjectURL(file), status:'compressing',
-                base64:null, mimeType:null, origSize:file.size, compSize:null });
-    renderGrid(p);
-    setProgress(p, true, `Mengkompres ${i+1}/${batch.length}...`, Math.round(10+(i/batch.length)*60));
-    try {
-      const r = await compressImage(file);
-      Object.assign(S[p][idx], { base64:r.base64, mimeType:r.mimeType, compSize:r.compSize,
-        localUrl:r.dataUrl, status:'ready' });
-    } catch(err) {
-      S[p][idx].status = 'error'; S[p][idx].errMsg = err.message;
+    setSyncStatus('error', e.name==='AbortError' ? 'Timeout' : 'Gagal konek');
+    if (!silent) {
+      document.getElementById('loading-box').style.display  = 'none';
+      document.getElementById('url-config-box').style.display = 'block';
+      document.getElementById('url-input').value = SYNC_URL;
     }
-    renderGrid(p);
   }
-  setProgress(p, false);
-  updateZone(p);
 }
 
-function renderGrid(p) {
-  const grid = document.getElementById(p+'-grid');
-  if (!S[p].length) { grid.innerHTML=''; return; }
-  grid.innerHTML = S[p].map((ph,i) => {
-    const badge = ph.status==='compressing' ? `<div class="photo-badge badge-compress">⏳ kompres</div>`
-      : ph.status==='uploading' ? `<div class="photo-badge badge-upload">⬆ upload</div>`
-      : ph.status==='done'      ? `<div class="photo-badge badge-done">✅ Drive</div>`
-      : ph.status==='error'     ? `<div class="photo-badge badge-error">❌ ${ph.errMsg||'error'}</div>`
-      : ph.compSize ? `<div class="photo-badge badge-done">${fmtBytes(ph.compSize)}</div>` : '';
-    return `<div class="photo-thumb">
-      <img src="${ph.localUrl}" alt="foto ${i+1}">
-      ${badge}
-      <button class="del-btn" onclick="removePhoto('${p}',${i})">×</button>
+// ─────────────────────────────────────────────────────────
+//  BUILD EJO LIST (same logic as dashboard)
+// ─────────────────────────────────────────────────────────
+function buildEJOList() {
+  const map = {};
+  projects.forEach(p => {
+    if (p.ejo && p.ejo.trim()) {
+      const key = p.ejo.trim().toUpperCase();
+      if (!map[key]) map[key] = { no: key, entries: [] };
+      map[key].entries.push({
+        type:'project', id:p.id, name:p.name,
+        category:p.category, ejoType:p.ejoType||'',
+        pic:p.pic||'—', status:p.status,
+        progress:p.progress||0,
+        startDate:p.startDate||'', endDate:p.endDate||'',
+        location:p.location||'', notes:p.notes||'',
+      });
+    }
+    (p.phases||[]).forEach(ph => {
+      if (!ph.ejo||!ph.ejo.trim()) return;
+      const key = ph.ejo.trim().toUpperCase();
+      if (!map[key]) map[key] = { no:key, entries:[] };
+      map[key].entries.push({
+        type:'fase', id:p.id+'_'+(ph.id||ph.name),
+        projId:p.id, projName:p.name,
+        faseName:ph.name||'—', category:p.category,
+        pic:ph.pic||p.pic||'—', status:ph.status||p.status,
+        progress:p.progress||0,
+        startDate:ph.start||p.startDate||'',
+        endDate:ph.end||p.endDate||'',
+        location:p.location||'', desc:ph.desc||'',
+      });
+    });
+  });
+
+  return Object.values(map).map(ejo => {
+    const statuses = ejo.entries.map(e=>e.status);
+    let aggStatus  = 'open';
+    if (statuses.every(s=>s==='done'))           aggStatus = 'done';
+    else if (statuses.some(s=>s==='blocked'))    aggStatus = 'blocked';
+    else if (statuses.some(s=>s==='inprogress')) aggStatus = 'inprogress';
+    else if (statuses.some(s=>s==='waiting'))    aggStatus = 'waiting';
+    const avgProg = Math.round(ejo.entries.reduce((a,e)=>a+(e.progress||0),0)/ejo.entries.length);
+    const ejoType = ejo.entries.map(e=>e.ejoType||'').find(t=>t) || '';
+    return { ...ejo, aggStatus, avgProg, ejoType };
+  }).sort((a,b)=>a.no.localeCompare(b.no));
+}
+
+// ─────────────────────────────────────────────────────────
+//  RENDER STATS
+// ─────────────────────────────────────────────────────────
+function renderStats() {
+  const total    = ejoList.length;
+  const open     = ejoList.filter(e=>e.aggStatus==='open').length;
+  const ongoing  = ejoList.filter(e=>e.aggStatus==='inprogress').length;
+  const blocked  = ejoList.filter(e=>e.aggStatus==='blocked'||e.aggStatus==='waiting').length;
+  const done     = ejoList.filter(e=>e.aggStatus==='done').length;
+
+  // Material stats
+  const matReady   = materials.filter(m=>m.status==='ready').length;
+  const matPending = materials.filter(m=>m.status==='pending'||m.status==='order').length;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card purple">
+      <div class="stat-val" style="color:var(--purple);">${total}</div>
+      <div class="stat-lbl">Total EJO</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-val" style="color:var(--accent2);">${open}</div>
+      <div class="stat-lbl">Open</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-val" style="color:var(--accent);">${ongoing}</div>
+      <div class="stat-lbl">On-Going</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-val" style="color:var(--danger);">${blocked}</div>
+      <div class="stat-lbl">Blocked / Wait</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-val" style="color:var(--accent3);">${done}</div>
+      <div class="stat-lbl">Completed</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-val" style="color:var(--teal);">${matReady}</div>
+      <div class="stat-lbl">Material Ready</div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────────────────
+const STATUS_CFG = {
+  open:       { label:'Open',     dot:'var(--accent2)' },
+  inprogress: { label:'On-Going', dot:'var(--accent)'  },
+  blocked:    { label:'Blocked',  dot:'var(--danger)'  },
+  waiting:    { label:'Waiting',  dot:'var(--text-muted)' },
+  done:       { label:'Done',     dot:'var(--accent3)' },
+};
+const EJO_TYPE_CFG = {
+  civil:      { label:'Civil',      color:'#64748b', bg:'rgba(100,116,139,0.15)' },
+  mechanical: { label:'Mechanical', color:'#f59e0b', bg:'rgba(245,158,11,0.15)'  },
+  electrical: { label:'Electrical', color:'#3b82f6', bg:'rgba(59,130,246,0.15)'  },
+  program:    { label:'Program',    color:'#8b5cf6', bg:'rgba(139,92,246,0.15)'  },
+  it:         { label:'IT',         color:'#06b6d4', bg:'rgba(6,182,212,0.15)'   },
+  kalibrasi:  { label:'Kalibrasi',  color:'#10b981', bg:'rgba(16,185,129,0.15)'  },
+};
+const CAT_LABELS = { '5r':'5R','she':'SHE','improve':'Improve','perbaikan':'Perbaikan' };
+const MAT_STATUS_LABELS = { pending:'⏳ Pending', order:'📦 On Order', ready:'✅ Ready', used:'✓ Used' };
+
+function fmt(d) {
+  if (!d) return '—';
+  const dt = new Date(d);
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function progColor(status) {
+  return status==='done'?'var(--accent3)':status==='blocked'?'var(--danger)':'var(--accent)';
+}
+
+// ─────────────────────────────────────────────────────────
+//  GET MATERIALS FOR EJO
+// ─────────────────────────────────────────────────────────
+function getMaterialsForEJO(ejo) {
+  const projIds = new Set(ejo.entries.map(e=>e.type==='project'?e.id:e.projId).filter(Boolean));
+  return materials.filter(m=>projIds.has(m.projectId));
+}
+
+// ─────────────────────────────────────────────────────────
+//  RENDER EJO
+// ─────────────────────────────────────────────────────────
+function renderEJO() {
+  const search  = (document.getElementById('search-input').value||'').toLowerCase();
+  const fType   = document.getElementById('filter-type').value;
+  const fStatus = document.getElementById('filter-status').value;
+
+  let list = ejoList;
+  if (search)  list = list.filter(e =>
+    e.no.toLowerCase().includes(search) ||
+    e.entries.some(x=>(x.name||x.faseName||x.projName||'').toLowerCase().includes(search))
+  );
+  if (fType)   list = list.filter(e=>e.ejoType===fType);
+  if (fStatus) {
+    if (fStatus==='blocked') list = list.filter(e=>e.aggStatus==='blocked'||e.aggStatus==='waiting');
+    else list = list.filter(e=>e.aggStatus===fStatus);
+  }
+
+  document.getElementById('ejo-count-label').textContent = list.length + ' EJO ditemukan';
+
+  if (!list.length) {
+    document.getElementById('ejo-grid').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <div class="empty-title">${ejoList.length===0?'Belum ada data EJO':'Tidak ada EJO yang cocok dengan filter ini'}</div>
+        <div class="empty-sub">${ejoList.length===0?'Periksa koneksi atau konfigurasi URL':'Coba ubah filter pencarian'}</div>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('ejo-grid').innerHTML = list.map(ejo => {
+    const sc      = STATUS_CFG[ejo.aggStatus] || STATUS_CFG.open;
+    const tc      = EJO_TYPE_CFG[ejo.ejoType] || null;
+    const mats    = getMaterialsForEJO(ejo);
+    const matReady   = mats.filter(m=>m.status==='ready'||m.status==='used').length;
+    const matTotal   = mats.length;
+    const matAllReady = matTotal > 0 && matReady === matTotal;
+    const isExpanded  = expandedNo === ejo.no;
+
+    const projNames = [...new Set(ejo.entries.map(e=>e.type==='project'?e.name:e.projName))].slice(0,2).join(', ');
+    const moreCount = ejo.entries.length - 1;
+
+    // Material summary chip
+    const matChip = matTotal > 0
+      ? `<span style="font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;
+          background:${matAllReady?'rgba(16,185,129,0.12)':'rgba(245,158,11,0.12)'};
+          color:${matAllReady?'var(--accent3)':'var(--accent)'};
+          border:1px solid ${matAllReady?'rgba(16,185,129,0.3)':'rgba(245,158,11,0.3)'};">
+          ${matAllReady?'✅':'⏳'} MAT ${matReady}/${matTotal}
+        </span>`
+      : '';
+
+    return `
+    <div class="ejo-card st-${ejo.aggStatus}">
+      <div class="ejo-card-header" onclick="toggleExpand('${ejo.no.replace(/'/g,"\\'")}')">
+        <div class="ejo-no">${ejo.no}</div>
+        <div class="ejo-name">
+          ${projNames}${ejo.entries.length>1?` <span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);">+${moreCount}</span>`:''}
+        </div>
+        <div class="ejo-meta">
+          ${tc?`<span class="type-badge" style="background:${tc.bg};color:${tc.color};">${tc.label}</span>`:''}
+          ${matChip}
+          <span class="badge ${ejo.aggStatus}">
+            <span class="badge-dot" style="background:${sc.dot};"></span>${sc.label}
+          </span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="ejo-progress-wrap">
+              <div class="ejo-progress-fill" style="width:${ejo.avgProg}%;background:${progColor(ejo.aggStatus)};"></div>
+            </div>
+            <span class="ejo-pct">${ejo.avgProg}%</span>
+          </div>
+          <button class="expand-btn">${isExpanded?'▲ Tutup':'▼ Detail'}</button>
+        </div>
+      </div>
+      <div class="ejo-detail ${isExpanded?'open':''}">
+        <div class="ejo-detail-inner">
+          ${renderDetail(ejo)}
+        </div>
+      </div>
     </div>`;
   }).join('');
 }
 
-function removePhoto(p, i) { S[p].splice(i,1); renderGrid(p); updateZone(p); }
+// ─────────────────────────────────────────────────────────
+//  RENDER DETAIL
+// ─────────────────────────────────────────────────────────
+function renderDetail(ejo) {
+  const sc   = STATUS_CFG[ejo.aggStatus] || STATUS_CFG.open;
+  const tc   = EJO_TYPE_CFG[ejo.ejoType] || null;
+  const cat  = CAT_LABELS[ejo.entries[0]?.category] || ejo.entries[0]?.category || '—';
+  const mats = getMaterialsForEJO(ejo);
 
-function updateZone(p) {
-  const n    = S[p].length;
-  const zone = document.getElementById(p+'-photo-zone');
-  zone.querySelector('.zone-title').textContent = n>=MAX_PHOTOS
-    ? MAX_PHOTOS+' foto (maksimal)'
-    : n>0 ? n+' foto dipilih — tap untuk tambah lagi'
-    : 'Tap untuk ambil / pilih foto';
-  zone.querySelector('.zone-sub').textContent = n>=MAX_PHOTOS
-    ? 'Hapus salah satu untuk mengganti'
-    : n>0 ? 'Maks '+(MAX_PHOTOS-n)+' foto lagi · Dikompres otomatis (max ~500KB)'
-    : 'Maks 3 foto · Dikompres otomatis (max ~500KB) lalu disimpan ke Google Drive';
+  // Info grid
+  const firstE = ejo.entries[0] || {};
+  const infoGrid = `
+    <div class="detail-grid">
+      <div>
+        <div class="detail-item-lbl">Status Agregat</div>
+        <div class="detail-item-val">
+          <span class="badge ${ejo.aggStatus}">
+            <span class="badge-dot" style="background:${sc.dot};"></span>${sc.label}
+          </span>
+        </div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Progress</div>
+        <div class="detail-item-val">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="ejo-progress-wrap" style="width:80px;">
+              <div class="ejo-progress-fill" style="width:${ejo.avgProg}%;background:${progColor(ejo.aggStatus)};"></div>
+            </div>
+            <span style="font-family:var(--mono);font-size:12px;font-weight:700;">${ejo.avgProg}%</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Jenis EJO</div>
+        <div class="detail-item-val">
+          ${tc?`<span class="type-badge" style="background:${tc.bg};color:${tc.color};font-size:10px;">${tc.label}</span>`:'<span style="color:var(--text-muted);">—</span>'}
+        </div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Kategori CI</div>
+        <div class="detail-item-val">${cat}</div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">PIC</div>
+        <div class="detail-item-val">${firstE.pic||'—'}</div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Lokasi</div>
+        <div class="detail-item-val">${firstE.location||'—'}</div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Tgl Mulai</div>
+        <div class="detail-item-val" style="font-family:var(--mono);font-size:11px;">${fmt(firstE.startDate)}</div>
+      </div>
+      <div>
+        <div class="detail-item-lbl">Tgl Selesai</div>
+        <div class="detail-item-val" style="font-family:var(--mono);font-size:11px;">${fmt(firstE.endDate)}</div>
+      </div>
+    </div>`;
+
+  // Phases
+  const phasesHtml = `
+    <div style="margin-bottom:14px;">
+      <div class="phases-title">Project & Fase Terkait</div>
+      <div class="phase-list">
+        ${ejo.entries.map(e => {
+          const esc = STATUS_CFG[e.status]||STATUS_CFG.open;
+          return `
+          <div class="phase-row">
+            <span class="phase-type ${e.type}">${e.type==='project'?'PROJECT':'FASE'}</span>
+            <div style="flex:1;min-width:0;">
+              <div class="phase-name">
+                ${e.type==='project'?e.name:`${e.faseName} <span class="phase-sub">← ${e.projName}</span>`}
+              </div>
+              ${(e.desc||e.notes)?`<div class="phase-sub" style="margin-top:2px;">${e.desc||e.notes}</div>`:''}
+            </div>
+            <span class="badge ${e.status||'open'}" style="font-size:9px;">
+              <span class="badge-dot" style="background:${esc.dot};"></span>${esc.label}
+            </span>
+            ${e.startDate?`<span class="phase-date">${fmt(e.startDate)} → ${fmt(e.endDate)}</span>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  // Materials
+  const matReady = mats.filter(m=>m.status==='ready'||m.status==='used').length;
+  const matsHtml = `
+    <div class="mat-section">
+      <div class="mat-section-title">
+        Status Material
+        ${mats.length>0?`<span style="color:var(--text-muted);font-weight:400;">(${matReady}/${mats.length} siap)</span>`:''}
+      </div>
+      ${mats.length===0
+        ? '<div class="mat-empty">Tidak ada material terdaftar untuk EJO ini</div>'
+        : `<div class="mat-list">
+            ${mats.map(m => {
+              const proj = projects.find(p=>p.id===m.projectId);
+              return `
+              <div class="mat-row">
+                <span class="mat-name">${m.name}</span>
+                <span class="mat-partno">${m.partno||'—'}</span>
+                <span class="mat-qty">${m.qty||'—'} ${m.unit||''}</span>
+                <span class="mat-status-badge ${m.status||'pending'}">${MAT_STATUS_LABELS[m.status]||m.status}</span>
+                ${m.eta?`<span class="mat-eta">ETA: ${fmt(m.eta)}</span>`:''}
+                ${proj?`<span style="font-family:var(--mono);font-size:9px;color:var(--text-muted);">${proj.name}</span>`:''}
+              </div>`;
+            }).join('')}
+          </div>`
+      }
+    </div>`;
+
+  return infoGrid + phasesHtml + matsHtml;
 }
 
-function setProgress(p, show, lbl='', pct=0) {
-  const el = document.getElementById(p+'-prog');
-  el.classList.toggle('show', show);
-  if (show) {
-    document.getElementById(p+'-prog-fill').style.width = pct+'%';
-    document.getElementById(p+'-prog-lbl').textContent  = lbl;
+// ─────────────────────────────────────────────────────────
+//  TOGGLE EXPAND
+// ─────────────────────────────────────────────────────────
+function toggleExpand(no) {
+  expandedNo = expandedNo === no ? null : no;
+  renderEJO();
+  if (expandedNo) {
+    setTimeout(() => {
+      const cards = document.querySelectorAll('.ejo-card');
+      cards.forEach(c => {
+        if (c.querySelector('.ejo-no')?.textContent === no) {
+          c.scrollIntoView({ behavior:'smooth', block:'nearest' });
+        }
+      });
+    }, 60);
   }
 }
-
-// ── DRIVE UPLOAD ─────────────────────────────────────────────
-async function uploadToDrive(ph, subFolder, submitter) {
-  const body = JSON.stringify({
-    action:    'uploadPhoto',
-    photoData: ph.base64,
-    mimeType:  ph.mimeType,
-    fileName:  ph.name.replace(/\.[^.]+$/,'')+'_'+Date.now()+'.jpg',
-    subFolder, submitter,
-  });
-  // FIX [1][4]: fetchGAS → redirect:follow + timeout 25s
-  const res = await fetchGAS(SYNC_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body,
-  });
-  // FIX [5]: error HTTP lebih informatif
-  if (!res.ok) throw new Error(`Upload gagal — HTTP ${res.status} ${res.statusText}`);
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error || 'Upload ke Drive gagal (tidak ada pesan error)');
-  return data;
-}
-
-async function uploadAll(p, subFolder, submitter) {
-  const ready = S[p].filter(ph=>ph.status==='ready'&&ph.base64);
-  if (!ready.length) return [];
-  const results = [];
-  for (let i=0; i<ready.length; i++) {
-    const ph  = ready[i];
-    const idx = S[p].indexOf(ph);
-    setProgress(p, true, `Upload foto ${i+1}/${ready.length} ke Google Drive...`,
-      Math.round(60+(i/ready.length)*35));
-    S[p][idx].status='uploading'; renderGrid(p);
-    try {
-      const r = await uploadToDrive(ph, subFolder, submitter);
-      S[p][idx].driveUrl=r.viewUrl; S[p][idx].driveId=r.fileId; S[p][idx].status='done';
-      results.push({ name:ph.name, viewUrl:r.viewUrl, thumbUrl:r.thumbUrl, fileId:r.fileId });
-    } catch(err) {
-      S[p][idx].status='error'; S[p][idx].errMsg=err.message;
-      results.push({ name:ph.name, error:err.message });
-    }
-    renderGrid(p);
-  }
-  setProgress(p, false);
-  return results;
-}
-
-// ── SHEETS API ────────────────────────────────────────────────
-// FIX [1][4]: loadData menggunakan fetchGAS (redirect:follow + timeout)
-async function loadData() {
-  const r = await fetchGAS(SYNC_URL + '?t=' + Date.now(), { method: 'GET' });
-  // FIX [5]: error lebih informatif
-  if (!r.ok) throw new Error(`Gagal load data — HTTP ${r.status} ${r.statusText}`);
-  const text = await r.text();
-  try { return JSON.parse(text); }
-  catch(e) { throw new Error('Response dari Apps Script bukan JSON valid. Cek URL & deployment.'); }
-}
-
-// FIX [1][3][4][5]: pushData dengan redirect:follow + trim activityLog + timeout + error detail
-async function pushData(d) {
-  // FIX [3]: Trim activityLog agar payload tidak meledak melampaui 50KB limit Sheets
-  const payload = { ...d };
-  if (Array.isArray(payload.activityLog) && payload.activityLog.length > 50) {
-    payload.activityLog = payload.activityLog.slice(0, 50);
-  }
-  // Jika masih sangat besar (>180KB), hapus materialMaster — ada di sheet tersendiri
-  let body = JSON.stringify(payload);
-  if (body.length > 180000) {
-    delete payload.materialMaster;
-    body = JSON.stringify(payload);
-  }
-  // FIX [1][4]: fetchGAS → redirect:follow + timeout 25s
-  const r = await fetchGAS(SYNC_URL, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body,
-  });
-  // FIX [5]: error HTTP lebih informatif
-  if (!r.ok) throw new Error(`Gagal simpan — HTTP ${r.status} ${r.statusText}`);
-  const txt = await r.text();
-  if (txt.startsWith('ERROR')) throw new Error('Apps Script error: ' + txt);
-}
-
-// ── VALIDATE ──────────────────────────────────────────────────
-function validate(fields) {
-  for (const [id, lbl] of fields) {
-    const el = document.getElementById(id);
-    if (!el?.value.trim()) { el?.focus(); alert('⚠ "'+lbl+'" wajib diisi.'); return false; }
-  }
-  return true;
-}
-
-// ── SHOW STATUS ───────────────────────────────────────────────
-function showStatus(p, type, icon, title, msg, links) {
-  const box = document.getElementById(p+'-status');
-  const linksHtml = links?.filter(l=>l.viewUrl).length
-    ? `<div class="drive-links"><p>📁 Foto tersimpan di Google Drive:</p>`
-      + links.filter(l=>l.viewUrl).map((l,i)=>`<a class="drive-link" href="${l.viewUrl}" target="_blank">📷 Foto ${i+1} — Lihat di Drive</a>`).join('<br>')
-      + '</div>'
-    : '';
-  box.className='status-box show '+type;
-  box.innerHTML=`<div class="status-icon">${icon}</div><div class="status-title">${title}</div>
-    <div class="status-msg">${msg}</div>${linksHtml}
-    <button class="reset-btn" onclick="resetForm('${p}')">← Isi Form Lagi</button>`;
-  box.scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-// ── RESET ─────────────────────────────────────────────────────
-function resetForm(p) {
-  const fid = p==='pj'?'project':'issue';
-  document.querySelectorAll('#form-'+fid+' input, #form-'+fid+' textarea, #form-'+fid+' select').forEach(el=>{
-    if(el.type==='select-one') el.selectedIndex=el.id.includes('prio')?1:0;
-    else if(el.type!=='file') el.value='';
-  });
-  S[p]=[]; renderGrid(p); updateZone(p);
-  document.getElementById(p+'-status').className='status-box';
-  const btn=document.getElementById(p+'-btn');
-  btn.disabled=false;
-  btn.innerHTML=p==='pj'?'📤 KIRIM REQUEST PROJECT':'🚨 LAPORKAN MASALAH';
-  if(p==='is') document.getElementById('is-date').value=todayStr();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ── SUBMIT PROJECT ────────────────────────────────────────────
-async function submitProject() {
-  if (!validate([['pj-submitter','Nama Pengaju'],['pj-name','Judul Project'],['pj-loc','Lokasi / Area']])) return;
-  const btn = document.getElementById('pj-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses...';
-  const submitter = document.getElementById('pj-submitter').value.trim();
-  const projName  = document.getElementById('pj-name').value.trim();
-  try {
-    const sub    = safeName('PROJECT_'+projName+'_'+todayStr());
-    const photos = await uploadAll('pj', sub, submitter);
-
-    btn.innerHTML = '<span class="spinner"></span> Menyimpan ke dashboard...';
-    const data = await loadData();
-
-    const proj = {
-      id:        genId('PROJ'),
-      name:      projName,
-      // FIX [2]: value sudah sesuai dashboard (perbaikan/improve/5R/SHE)
-      category:  document.getElementById('pj-cat').value,
-      priority:  document.getElementById('pj-prio').value,
-      location:  document.getElementById('pj-loc').value.trim(),
-      ejo:       document.getElementById('pj-ejo').value.trim(),
-      rootcause: document.getElementById('pj-desc').value.trim(),
-      notes:     document.getElementById('pj-notes').value.trim(),
-      status:    'open', progress:0, matStatus:'pending', phases:[],
-      createdAt: Date.now(), submittedBy: submitter,
-      photos, driveFolder: sub,
-      _source: 'ci-form', _submittedAt: new Date().toISOString(),
-    };
-
-    const log = {
-      id:   genId('LOG'), ts: Date.now(), type: 'project_created',
-      msg:  `[FORM] Project dari ${submitter}: "${projName}"`,
-      user: submitter, projId: proj.id,
-    };
-
-    // FIX [3]: activityLog baru ditambah di depan, trim terjadi di dalam pushData
-    const projects    = [proj, ...(data.projects    || [])];
-    const activityLog = [log,  ...(data.activityLog || [])];
-    await pushData({ ...data, projects, activityLog });
-
-    const n = photos.filter(ph=>ph.viewUrl).length;
-    showStatus('pj','success','✅','Request Berhasil Dikirim!',
-      `Project "<strong>${projName}</strong>" telah masuk ke dashboard CI.`
-      +(n?`<br>📷 ${n} foto disimpan di Google Drive (folder: <em>${sub}</em>).`:'')
-      +`<br><br>Tim CI akan menentukan jadwal pengerjaan.`, photos);
-
-  } catch(err) {
-    console.error('[submitProject]', err);
-    btn.disabled=false; btn.innerHTML='📤 KIRIM REQUEST PROJECT';
-    // FIX [5]: tampilkan pesan error asli
-    showStatus('pj','error','❌','Gagal Mengirim',
-      'Terjadi kesalahan. Coba lagi atau hubungi tim CI langsung.'
-      +`<br><small style="font-family:monospace;opacity:.55;font-size:10px;">${err.message}</small>`);
-  }
-}
-
-// ── SUBMIT ISSUE ──────────────────────────────────────────────
-async function submitIssue() {
-  if (!validate([['is-submitter','Nama Pelapor'],['is-name','Judul Masalah'],['is-loc','Lokasi / Area'],['is-desc','Deskripsi Masalah']])) return;
-  const btn = document.getElementById('is-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Memproses...';
-  const submitter = document.getElementById('is-submitter').value.trim();
-  const issueName = document.getElementById('is-name').value.trim();
-  try {
-    const sub    = safeName('ISSUE_'+issueName+'_'+todayStr());
-    const photos = await uploadAll('is', sub, submitter);
-
-    btn.innerHTML='<span class="spinner"></span> Menyimpan ke dashboard...';
-    const data = await loadData();
-
-    const issue = {
-      id:          genId('ISS'),
-      name:        issueName,
-      category:    document.getElementById('is-cat').value,
-      priority:    document.getElementById('is-prio').value,
-      location:    document.getElementById('is-loc').value.trim(),
-      description: document.getElementById('is-desc').value.trim(),
-      date:        document.getElementById('is-date').value || todayStr(),
-      downtime:    document.getElementById('is-downtime').value || '0',
-      actionTaken: document.getElementById('is-action').value.trim(),
-      status:      'open', createdAt: Date.now(), submittedBy: submitter,
-      photos, driveFolder: sub,
-      _source: 'ci-form', _submittedAt: new Date().toISOString(),
-    };
-
-    const log = {
-      id:   genId('LOG'), ts: Date.now(), type: 'issue_created',
-      msg:  `[FORM] Laporan dari ${submitter}: "${issueName}" di ${issue.location}`,
-      user: submitter,
-    };
-
-    // FIX [3]: activityLog baru ditambah di depan, trim terjadi di dalam pushData
-    const issues      = [issue, ...(data.issues      || [])];
-    const activityLog = [log,   ...(data.activityLog || [])];
-    await pushData({ ...data, issues, activityLog });
-
-    const n = photos.filter(ph=>ph.viewUrl).length;
-    showStatus('is','success','✅','Laporan Berhasil Dikirim!',
-      `Laporan "<strong>${issueName}</strong>" telah masuk ke dashboard CI.`
-      +(n?`<br>📷 ${n} foto disimpan di Google Drive (folder: <em>${sub}</em>).`:'')
-      +`<br><br>Tim CI akan segera menindaklanjuti laporan ini.`, photos);
-
-  } catch(err) {
-    console.error('[submitIssue]', err);
-    btn.disabled=false; btn.innerHTML='🚨 LAPORKAN MASALAH';
-    // FIX [5]: tampilkan pesan error asli
-    showStatus('is','error','❌','Gagal Mengirim',
-      'Terjadi kesalahan. Coba lagi atau hubungi tim CI langsung.'
-      +`<br><small style="font-family:monospace;opacity:.55;font-size:10px;">${err.message}</small>`);
-  }
-}
-
-// ── INIT ──────────────────────────────────────────────────────
-document.getElementById('is-date').value = todayStr();
 </script>
 </body>
 </html>
