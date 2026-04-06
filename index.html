@@ -283,6 +283,146 @@ body {
   .filter-bar { padding: 10px; }
   .detail-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── MEDIA SECTION ── */
+.media-section { margin-top: 14px; }
+.media-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.media-tab {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  padding: 7px 14px; cursor: pointer; color: var(--text-muted);
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  transition: all 0.15s; letter-spacing: 0.5px;
+}
+.media-tab:hover { color: var(--text); }
+.media-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.media-pane { display: none; }
+.media-pane.active { display: block; }
+
+/* Photo grid */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+.photo-item {
+  position: relative; border-radius: 4px; overflow: hidden;
+  border: 1px solid var(--border); background: var(--surface2);
+  aspect-ratio: 1; cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.photo-item:hover { border-color: var(--accent); transform: scale(1.02); }
+.photo-item img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.photo-item-fallback {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  font-size: 22px; color: var(--text-muted);
+}
+.photo-item-name {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.75));
+  padding: 12px 6px 4px;
+  font-size: 9px; font-family: var(--mono); color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.photo-open-btn {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.6); border: none;
+  color: #fff; font-size: 10px; padding: 2px 5px;
+  border-radius: 2px; cursor: pointer; opacity: 0;
+  transition: opacity 0.15s;
+}
+.photo-item:hover .photo-open-btn { opacity: 1; }
+
+/* File list */
+.file-list { display: flex; flex-direction: column; gap: 5px; }
+.file-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 2px;
+  transition: border-color 0.12s;
+}
+.file-row:hover { border-color: var(--accent2); }
+.file-icon { font-size: 18px; flex-shrink: 0; }
+.file-info { flex: 1; min-width: 0; }
+.file-name {
+  font-size: 12px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-meta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); margin-top: 1px; }
+.file-open-btn {
+  flex-shrink: 0; padding: 4px 10px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--accent2); cursor: pointer; text-decoration: none;
+  transition: all 0.12s; white-space: nowrap;
+}
+.file-open-btn:hover { border-color: var(--accent2); background: rgba(59,130,246,0.08); }
+
+/* Drive folder link */
+.drive-folder-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; margin-bottom: 10px;
+  background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25);
+  color: var(--accent2); text-decoration: none;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.5px; transition: all 0.12s;
+}
+.drive-folder-link:hover { background: rgba(59,130,246,0.15); border-color: var(--accent2); }
+
+/* Lightbox */
+.lightbox-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+  padding: 20px;
+}
+.lightbox-overlay.open { display: flex; }
+.lightbox-inner {
+  position: relative; max-width: 90vw; max-height: 90vh;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.lightbox-img {
+  max-width: 100%; max-height: 80vh; object-fit: contain;
+  border: 1px solid var(--border2);
+}
+.lightbox-caption {
+  font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+  text-align: center;
+}
+.lightbox-close {
+  position: absolute; top: -14px; right: -14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s;
+}
+.lightbox-close:hover { background: var(--danger); color: #fff; }
+.lightbox-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0,0,0,0.5); border: 1px solid var(--border2);
+  color: var(--text); width: 32px; height: 32px;
+  font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: background 0.12s;
+}
+.lightbox-nav:hover { background: rgba(245,158,11,0.3); }
+.lightbox-nav.prev { right: calc(100% + 12px); }
+.lightbox-nav.next { left: calc(100% + 12px); }
+.lightbox-counter {
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+}
+
+/* media empty */
+.media-empty {
+  padding: 20px; text-align: center;
+  font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+}
+
 </style>
 </head>
 <body>
@@ -800,7 +940,7 @@ function renderDetail(ejo) {
       }
     </div>`;
 
-  return infoGrid + phasesHtml + matsHtml;
+  return infoGrid + phasesHtml + matsHtml + renderMediaSection(ejo);
 }
 
 // ─────────────────────────────────────────────────────────
@@ -820,6 +960,236 @@ function toggleExpand(no) {
     }, 60);
   }
 }
+
+// ─────────────────────────────────────────────────────────
+//  HELPER: FILE ICON
+// ─────────────────────────────────────────────────────────
+function fileIcon(name) {
+  if (!name) return '📄';
+  const ext = (name.split('.').pop()||'').toLowerCase();
+  if (['jpg','jpeg','png','gif','webp','bmp'].includes(ext)) return '🖼️';
+  if (['pdf'].includes(ext))                                  return '📋';
+  if (['xlsx','xls','csv'].includes(ext))                    return '📊';
+  if (['docx','doc'].includes(ext))                          return '📝';
+  if (['pptx','ppt'].includes(ext))                          return '📑';
+  if (['zip','rar','7z'].includes(ext))                      return '🗜️';
+  if (['dwg','dxf'].includes(ext))                           return '📐';
+  return '📄';
+}
+
+function isImageFile(name) {
+  if (!name) return false;
+  return ['jpg','jpeg','png','gif','webp','bmp'].includes((name.split('.').pop()||'').toLowerCase());
+}
+
+function fmtSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+// ─────────────────────────────────────────────────────────
+//  GET MEDIA FOR EJO
+// ─────────────────────────────────────────────────────────
+function getMediaForEJO(ejo) {
+  const projIds = new Set(
+    ejo.entries.map(e => e.type==='project' ? e.id : e.projId).filter(Boolean)
+  );
+  const photos = [];
+  const docs   = [];
+  const drives = []; // {name, url}
+
+  projects.filter(p => projIds.has(p.id)).forEach(p => {
+    // Photos
+    (p.photos||[]).forEach(ph => {
+      if (ph.viewUrl || ph.src || ph.thumbUrl) {
+        photos.push({ ...ph, _projName: p.name });
+      }
+    });
+    // Uploaded docs
+    (p.docs||[]).forEach(d => {
+      if (d.viewUrl || d.directUrl) {
+        docs.push({ ...d, _projName: p.name });
+      }
+    });
+    // Google Drive folder link
+    if (p.gdrive) drives.push({ name: p.name + ' — Google Drive', url: p.gdrive });
+    if (p.driveFolderUrl && p.driveFolderUrl !== p.gdrive)
+      drives.push({ name: p.name + ' — Folder Project', url: p.driveFolderUrl });
+  });
+
+  return { photos, docs, drives };
+}
+
+// ─────────────────────────────────────────────────────────
+//  RENDER MEDIA SECTION
+// ─────────────────────────────────────────────────────────
+function renderMediaSection(ejo) {
+  const { photos, docs, drives } = getMediaForEJO(ejo);
+  const total = photos.length + docs.length + drives.length;
+  if (total === 0) return '';
+
+  const tabId   = 'media_' + ejo.no.replace(/[^a-zA-Z0-9]/g,'_');
+  const photoCount = photos.length;
+  const docCount   = docs.length + drives.length;
+
+  // Default active tab
+  const defTab = photoCount > 0 ? 'photo' : 'doc';
+
+  const photoTab = photoCount > 0
+    ? `<button class="media-tab ${defTab==='photo'?'active':''}" onclick="switchMediaTab('${tabId}','photo',this)">📷 Foto (${photoCount})</button>`
+    : '';
+  const docTab = docCount > 0
+    ? `<button class="media-tab ${defTab==='doc'?'active':''}" onclick="switchMediaTab('${tabId}','doc',this)">📁 File & Dokumen (${docCount})</button>`
+    : '';
+
+  // Photo pane
+  const photoPaneHtml = photoCount > 0 ? `
+    <div class="media-pane ${defTab==='photo'?'active':''}" id="${tabId}_photo">
+      <div class="photo-grid">
+        ${photos.map((ph, idx) => {
+          const thumbSrc = ph.thumbUrl || ph.src || '';
+          const linkUrl  = ph.viewUrl || ph.src || ph.directUrl || '#';
+          const name     = ph.name || ('Foto ' + (idx+1));
+          const hasImg   = !!thumbSrc;
+          return '<div class="photo-item" onclick="openLightbox(' + JSON.stringify(ejo.no) + ',' + idx + ')">'
+            + (hasImg
+              ? '<img src="' + thumbSrc + '" alt="' + name + '" loading="lazy" onerror="this.parentNode.querySelector(\'.photo-item-fallback\').style.display=\'flex\';this.style.display=\'none\'">'
+                + '<div class="photo-item-fallback" style="display:none">🖼️<span style="font-size:9px;font-family:var(--mono);color:var(--text-muted);">Gagal muat</span></div>'
+              : '<div class="photo-item-fallback">🖼️<span style="font-size:9px;font-family:var(--mono);color:var(--text-muted);">' + name.slice(0,12) + '</span></div>')
+            + '<div class="photo-item-name">' + name + '</div>'
+            + '<a href="' + linkUrl + '" target="_blank" onclick="event.stopPropagation()" class="photo-open-btn">↗</a>'
+            + '</div>';
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  // Doc pane
+  const docPaneHtml = docCount > 0 ? `
+    <div class="media-pane ${defTab==='doc'?'active':''}" id="${tabId}_doc">
+      <div class="file-list">
+        ${drives.map(dr => `
+          <a href="${dr.url}" target="_blank" class="drive-folder-link">
+            📂 ${dr.name} <span style="opacity:0.6;font-size:9px;">↗ Buka di Drive</span>
+          </a>`).join('')}
+        ${docs.map(d => {
+          const url  = d.viewUrl || d.directUrl || '#';
+          const name = d.name || d.fileName || 'File';
+          const icon = fileIcon(name);
+          return '<div class="file-row">'
+            + '<span class="file-icon">' + icon + '</span>'
+            + '<div class="file-info">'
+            + '<div class="file-name">' + name + '</div>'
+            + '<div class="file-meta">' + d._projName + (d.size ? ' · ' + fmtSize(d.size) : '') + (d.uploadedAt ? ' · ' + fmt(d.uploadedAt) : '') + '</div>'
+            + '</div>'
+            + '<a href="' + url + '" target="_blank" class="file-open-btn">↗ Buka</a>'
+            + '</div>';
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  return `
+    <div class="media-section">
+      <div class="mat-section-title" style="margin-bottom:8px;">Foto & File Dokumen</div>
+      <div class="media-tabs">${photoTab}${docTab}</div>
+      ${photoPaneHtml}
+      ${docPaneHtml}
+    </div>`;
+}
+
+function switchMediaTab(tabId, pane, btn) {
+  // Deactivate all tabs and panes in this group
+  btn.closest('.media-tabs').querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const panes = btn.closest('.media-section').querySelectorAll('.media-pane');
+  panes.forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(tabId + '_' + pane);
+  if (target) target.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────
+//  LIGHTBOX
+// ─────────────────────────────────────────────────────────
+let _lbEjoNo  = null;
+let _lbPhotos = [];
+let _lbIdx    = 0;
+
+function openLightbox(ejoNo, idx) {
+  const ejo = ejoList.find(e => e.no === ejoNo);
+  if (!ejo) return;
+  const { photos } = getMediaForEJO(ejo);
+  if (!photos.length) return;
+
+  _lbEjoNo  = ejoNo;
+  _lbPhotos = photos;
+  _lbIdx    = idx;
+  showLightboxSlide();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function showLightboxSlide() {
+  const ph   = _lbPhotos[_lbIdx];
+  const img  = document.getElementById('lb-img');
+  const cap  = document.getElementById('lb-caption');
+  const ctr  = document.getElementById('lb-counter');
+  const prev = document.getElementById('lb-prev');
+  const next = document.getElementById('lb-next');
+
+  const src  = ph.viewUrl || ph.src || ph.thumbUrl || '';
+  const link = ph.viewUrl || ph.src || ph.directUrl || '#';
+  const name = ph.name || ('Foto ' + (_lbIdx+1));
+
+  img.src   = src;
+  img.alt   = name;
+  img.onclick = () => window.open(link, '_blank');
+  img.style.cursor = 'pointer';
+  img.title = 'Klik untuk buka di tab baru';
+  cap.innerHTML = name + ' <span style="opacity:0.5;">— ' + (ph._projName||'') + '</span>'
+    + ' <a href="' + link + '" target="_blank" style="color:var(--accent2);font-family:var(--mono);font-size:9px;margin-left:8px;">↗ Buka penuh</a>';
+  ctr.textContent = (_lbIdx+1) + ' / ' + _lbPhotos.length;
+  prev.style.display = _lbIdx > 0 ? 'flex' : 'none';
+  next.style.display = _lbIdx < _lbPhotos.length-1 ? 'flex' : 'none';
+}
+
+function lbNav(dir) {
+  _lbIdx = Math.max(0, Math.min(_lbPhotos.length-1, _lbIdx + dir));
+  showLightboxSlide();
+}
+
+function closeLightbox(e) {
+  if (e && e.target !== e.currentTarget) return;
+  closeLightboxDirect();
+}
+function closeLightboxDirect() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('lb-img').src = '';
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowLeft')  lbNav(-1);
+  if (e.key === 'ArrowRight') lbNav(1);
+  if (e.key === 'Escape')     closeLightboxDirect();
+});
+
 </script>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightboxDirect()">×</button>
+    <button class="lightbox-nav prev" id="lb-prev" onclick="lbNav(-1)">‹</button>
+    <img class="lightbox-img" id="lb-img" src="" alt="">
+    <button class="lightbox-nav next" id="lb-next" onclick="lbNav(1)">›</button>
+    <div class="lightbox-caption" id="lb-caption"></div>
+    <div class="lightbox-counter" id="lb-counter"></div>
+  </div>
+</div>
+
 </body>
 </html>
